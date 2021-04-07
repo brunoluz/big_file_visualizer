@@ -12,11 +12,17 @@ term = Terminal()
 
 def read_command():
     with term.cbreak():
-        inp = term.inkey().code
-        if inp == 259:  # arrow up
+
+        key = term.inkey()
+        code = key.code
+
+        if code == 259 or code == 339:  # arrow up / page up
             return "up", 11
-        elif inp == 258:  # arrow down
+        elif code == 258 or code == 338:  # arrow down / page down
             return "down", 11
+        elif key == "l":
+            print("we will read lines now")
+            return "goto", 10
         else:
             return "invalid", 0
 
@@ -33,7 +39,6 @@ if __name__ == '__main__':
         while True:
             command, lines = read_command()
             print(f"c {command}, l {lines}")
-
 
     except BigFileVisualizerError as custom_error:
         print(custom_error.message, file=stderr)
