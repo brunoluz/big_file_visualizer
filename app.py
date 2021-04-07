@@ -11,20 +11,24 @@ term = Terminal()
 
 
 def read_command():
-    with term.cbreak():
 
+    with term.cbreak():
         key = term.inkey()
         code = key.code
 
-        if code == 259 or code == 339:  # arrow up / page up
-            return "up", 11
-        elif code == 258 or code == 338:  # arrow down / page down
-            return "down", 11
-        elif key == "l":
-            print("we will read lines now")
-            return "goto", 10
-        else:
-            return "invalid", 0
+    if code == 259 or code == 339:  # arrow up / page up
+        return "up", 11
+
+    elif code == 258 or code == 338:  # arrow down / page down
+        return "down", 11
+
+    elif key == "l":
+        print("which line? ")
+        line_number = input()
+        if line_number.isnumeric():
+            return "goto", int(line_number)
+
+    return "invalid", 0
 
 
 if __name__ == '__main__':
