@@ -4,23 +4,24 @@ import traceback
 from sys import stderr
 from blessed import Terminal
 
-from bfv_error import BigFileVisualizerError
+from bfv_error import BigFileVisualizerFatalError
 from big_file_handler import BigFileHandler
 
 term = Terminal()
 
+_lines_to_show = 11
+
 
 def read_command():
-
     with term.cbreak():
         key = term.inkey()
         code = key.code
 
     if code == 259 or code == 339:  # arrow up / page up
-        return "up", 11
+        return "up", _lines_to_show
 
     elif code == 258 or code == 338:  # arrow down / page down
-        return "down", 11
+        return "down", _lines_to_show
 
     elif key == "l":
         print("which line? ")
@@ -38,13 +39,19 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     try:
-        bfh = BigFileHandler(args.file)
 
-        while True:
-            command, lines = read_command()
-            print(f"c {command}, l {lines}")
+        with BigFileHandler(args.file) as bfh:
+            print("***big file visualizer***")
+            print(f"Showing first {_lines_to_show} lines from {args.file}")
 
-    except BigFileVisualizerError as custom_error:
+            lines_dict = bfh.get_next_lines(_lines_to_show)
+            [print(f"line {i}: {lines_dict[i]}") for i in lines_dict.keys()]
+            
+            while True:
+                command, lines = read_command()
+                print(f"c {command}, l {lines}")
+
+    except BigFileVisualizerFatalError as custom_error:
         print(custom_error.message, file=stderr)
     except KeyboardInterrupt:
         pass
