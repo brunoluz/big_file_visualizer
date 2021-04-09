@@ -11,6 +11,7 @@ class BigFileHandler:
         self._file = file
         self._opened_file = open(self.get_file(), 'rt')
         self._current_line = 1
+        self._skip_lines = 11
 
         self._buffer = dict()  # line number, line content
         self._buffer_size = 100
@@ -43,20 +44,17 @@ class BigFileHandler:
         self._buffer_min_value = min(lines_in_buffer)
         self._buffer_max_value = max(lines_in_buffer)
 
-    def get_next_lines(self, number_of_lines):
-
-        if number_of_lines < 1 or number_of_lines > 100:
-            raise BigFileVisualizerCustomError("Invalid request")
+    def get_lines(self):
 
         if self._buffer_min_value <= self._current_line and \
-                self._current_line + number_of_lines <= self._buffer_max_value:
+                self._current_line + self._skip_lines <= self._buffer_max_value:
             # values are in buffer
             pass
         else:
             self.load_buffer(self._current_line)
 
         return_value = dict()
-        for i in range(self._current_line, self._current_line + number_of_lines, 1):
+        for i in range(self._current_line, self._current_line + self._skip_lines, 1):
             return_value[i] = self._buffer[i]
 
         return return_value

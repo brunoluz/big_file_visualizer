@@ -9,19 +9,22 @@ from big_file_handler import BigFileHandler
 
 term = Terminal()
 
-_lines_to_show = 11
-
-
 def read_command():
     with term.cbreak():
         key = term.inkey()
         code = key.code
 
-    if code == 259 or code == 339:  # arrow up / page up
-        return "up", _lines_to_show
+    if code == 339:
+        return "page_up", None
 
-    elif code == 258 or code == 338:  # arrow down / page down
-        return "down", _lines_to_show
+    elif code == 259:
+        return "up", None
+
+    elif code == 338:
+        return "page_down", None
+
+    elif code == 258:
+        return "down", None
 
     elif key == "l":
         print("which line? ")
@@ -42,9 +45,9 @@ if __name__ == '__main__':
 
         with BigFileHandler(args.file) as bfh:
             print("***big file visualizer***")
-            print(f"Showing first {_lines_to_show} lines from {args.file}")
+            print(f"Showing lines from {args.file}")
 
-            lines_dict = bfh.get_next_lines(_lines_to_show)
+            lines_dict = bfh.get_lines()
             [print(f"line {i}: {lines_dict[i]}") for i in lines_dict.keys()]
             
             while True:
