@@ -30,6 +30,15 @@ class BigFileHandler:
     def get_current_line(self):
         return self._current_line
 
+    def get_file(self):
+        return self._file
+
+    def get_buffer_min_value(self):
+        return min(self._buffer.keys())
+
+    def get_buffer_max_value(self):
+        return max(self._buffer.keys())
+
     def up(self):
         # we move up only if possible
         if self._current_line > 1:
