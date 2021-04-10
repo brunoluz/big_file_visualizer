@@ -62,13 +62,22 @@ class Test1000LinesFile(unittest.TestCase):
     def test_buffer_reads(self):
         with BigFileHandler("test_1000_lines_file.txt") as bfh:
             lines_1 = bfh.get_lines()
-            bfh.page_down()
-            bfh.page_down()
-            bfh.page_down()
-            bfh.page_down()
-            bfh.page_down()
-            bfh.page_down()
+            self.assertEqual("line 1", lines_1[1])
+            self.assertEqual("line 11", lines_1[11])
+
+            bfh.page_down()  # 12 position
+            bfh.page_down()  # 23 position
+            bfh.page_down()  # 34 position
+            bfh.page_down()  # 45 position
+            bfh.page_down()  # 56 position
+            bfh.page_down()  # 67 position
             lines_2 = bfh.get_lines()
+            self.assertEqual("line 67", lines_2[67])
+            self.assertEqual("line 77", lines_2[77])
+
             bfh.goto(659)
             lines_3 = bfh.get_lines()
+            self.assertEqual("line 659", lines_3[659])
+            self.assertEqual("line 669", lines_3[669])
+
             self.assertEqual(3, bfh.get_buffer_reads())

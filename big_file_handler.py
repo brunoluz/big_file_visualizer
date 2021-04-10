@@ -130,9 +130,7 @@ class BigFileHandler:
                 self._buffer_size = self._total_lines
             if self._skip_lines > self._total_lines:
                 self._skip_lines = self._total_lines
-            if self._buffer_size == self._skip_lines:
-                self._current_line = self._total_lines - self._skip_lines + 1
-            elif self._total_lines - self._current_line < self._skip_lines:
+            if self._buffer_size == self._skip_lines or self._total_lines - self._current_line < self._skip_lines:
                 self._current_line = self._total_lines - self._skip_lines + 1
 
     def get_lines(self):
@@ -152,7 +150,7 @@ class BigFileHandler:
         while True:
             return_value[i] = self._buffer[i]
             i += 1
-            if i >= self._current_line + self._skip_lines or \
-                    i not in self._buffer:
+            if i >= self._current_line + self._skip_lines or i not in self._buffer:
                 break
+
         return return_value
