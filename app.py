@@ -69,12 +69,12 @@ if __name__ == '__main__':
                     bfh.goto(line)
 
                 if command != "invalid":
+                    print("loading...")
                     print_lines()
 
     except BigFileVisualizerFatalError as custom_error:
         print(custom_error.message, file=stderr)
     except KeyboardInterrupt:
         pass
-    except:
-        # traceback.print_exc()
+    except:  # fatal error
         raise
