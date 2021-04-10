@@ -66,7 +66,7 @@ if __name__ == '__main__':
                 elif command == "page_down":
                     bfh.page_down()
                 elif command == "goto":
-                    bfh.goto(line)
+                    bfh.goto(line - 5)
 
                 if command != "invalid":
                     print("loading...")

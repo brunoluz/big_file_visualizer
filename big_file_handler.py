@@ -12,6 +12,7 @@ class BigFileHandler:
         self._opened_file = open(self._file, 'rt')  # opened file instance
         self._current_line = 1  # which line we are in
         self._skip_lines = 11  # page up/down or lines to be retrieved
+        self._line_break_index = dict()
         self._buffer = dict()  # line number, line content
         self._buffer_reads = 0
         self._buffer_size = 100
@@ -74,13 +75,24 @@ class BigFileHandler:
             self._current_line = self._total_lines - self._skip_lines + 1
 
     def goto(self, line):
-        if line > 0:
-            if self._total_lines is not None and line > self._total_lines - self._skip_lines:
-                self._current_line = self._total_lines - self._skip_lines
-                if self._current_line < 1:
-                    self._current_line = 1
-            else:
+        if self._skip_lines < 11:
+            self._current_line = 1
+            return
+
+        if line < 1:
+            self._current_line = 1
+        else:
+            if self._total_lines is None:
                 self._current_line = line
+            else:
+                if self._total_lines == 1:
+                    self._current_line = 1
+                elif line <= self._total_lines - self._skip_lines + 1:
+                    self._current_line = line
+                else:
+                    self._current_line = self._total_lines - self._skip_lines
+                    if self._current_line < 1:
+                        self._current_line = 1
 
     def load_buffer(self):
 
