@@ -54,7 +54,7 @@ class BigFileHandler:
     def down(self):
         if self._total_lines is None:
             self._current_line += 1
-        elif self._current_line < self._total_lines:
+        elif self._current_line <= self._total_lines - self._skip_lines:
             self._current_line += 1
 
     def page_up(self):
@@ -68,11 +68,15 @@ class BigFileHandler:
             self._current_line += self._skip_lines
         elif self._current_line + self._skip_lines < self._total_lines:
             self._current_line += self._skip_lines
+        elif self._current_line + self._skip_lines >= self._total_lines:
+            self._current_line = self._total_lines - self._skip_lines + 1
 
     def goto(self, line):
         if line > 0:
             if self._total_lines is not None and line > self._total_lines - self._skip_lines:
                 self._current_line = self._total_lines - self._skip_lines
+                if self._current_line < 1:
+                    self._current_line = 1
             else:
                 self._current_line = line
 
@@ -85,7 +89,6 @@ class BigFileHandler:
         self._opened_file.seek(0)
         self._buffer_reads += 1
 
-
         last_position = None
         for position, line in enumerate(self._opened_file):
             eof = True
@@ -93,11 +96,11 @@ class BigFileHandler:
             self._buffer[position + 1] = line.rstrip(os.linesep)
 
             # clear previous lines outside buffer
-            if position + 1 < self._current_line - ((self._buffer_size / 2) - 1):
+            if position + 1 < self._current_line - (int(self._buffer_size / 2) - 1):
                 self._buffer.pop(position + 1)
 
             # read next 50 lines from requested position
-            if position >= self._current_line + ((self._buffer_size / 2) - 1):
+            if position >= self._current_line + (int(self._buffer_size / 2) - 1):
                 eof = False  # not the end of file yet
                 break
 
@@ -115,16 +118,20 @@ class BigFileHandler:
             if self._buffer_size > self._total_lines:
                 self._buffer_size = self._total_lines
             if self._skip_lines > self._total_lines:
-                self._skip_lines = 0
-
-            self._current_line = self._total_lines - self._skip_lines
+                self._skip_lines = self._total_lines
+            if self._buffer_size == self._skip_lines:
+                self._current_line = self._total_lines - self._skip_lines + 1
 
     def get_lines(self):
 
-        # if requested line range is outside buffer, we need to load another buffer range.
-        if self._current_line < min(self._buffer.keys()) or \
-                self._current_line + self._skip_lines > max(self._buffer.keys()):
-            self.load_buffer()
+        if self._skip_lines == 11:
+            # only try to load lines if lines to show are equal to 11. If it is different, it
+            # means we are trying to open a less than 11 lines file.
+
+            if self._current_line < self.get_buffer_min_value() or \
+                    self._current_line + self._skip_lines - 1 > self.get_buffer_max_value():
+                # if requested line range is outside buffer, we need to load another buffer range.
+                self.load_buffer()
 
         # retrieve lines from buffer
         return_value = dict()
@@ -132,6 +139,7 @@ class BigFileHandler:
         while True:
             return_value[i] = self._buffer[i]
             i += 1
-            if i > self._current_line + self._skip_lines:
+            if i >= self._current_line + self._skip_lines or \
+                    i not in self._buffer:
                 break
         return return_value
