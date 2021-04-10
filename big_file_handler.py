@@ -132,6 +132,8 @@ class BigFileHandler:
                 self._skip_lines = self._total_lines
             if self._buffer_size == self._skip_lines:
                 self._current_line = self._total_lines - self._skip_lines + 1
+            elif self._total_lines - self._current_line < self._skip_lines:
+                self._current_line = self._total_lines - self._skip_lines + 1
 
     def get_lines(self):
 

@@ -48,7 +48,19 @@ class Test1000LinesFile(unittest.TestCase):
     def test_goto__negative_line(self):
         with BigFileHandler("test_1000_lines_file.txt") as bfh:
             bfh.goto(-1)
+            bfh.get_lines()
             self.assertEqual(1, bfh.get_current_line())
+
+    def test_navigate_last_lines(self):
+        with BigFileHandler("test_1000_lines_file.txt") as bfh:
+            bfh.goto(995)
+            lines = bfh.get_lines()
+            self.assertEqual("line 1000", lines[1000])
+            self.assertEqual("line 990", lines[990])
+            self.assertEqual(11, len(lines))
+
+
+
 
     def test_navigate_file_1(self):
         with BigFileHandler("test_1000_lines_file.txt") as bfh:

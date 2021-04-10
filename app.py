@@ -45,7 +45,6 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Bigfile line visualizer tool')
     parser.add_argument('--file', '-f', dest='file', help='file to be opened', required=True)
-
     args = parser.parse_args()
 
     try:
