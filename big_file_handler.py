@@ -1,5 +1,5 @@
 import os
-from bfv_error import BigFileVisualizerFatalError, BigFileVisualizerCustomError
+from bfh_error import BigFileVisualizerFatalError
 
 
 class BigFileHandler:
@@ -11,7 +11,7 @@ class BigFileHandler:
         self._file = file  # file name
         self._opened_file = open(self._file, 'rt')  # opened file instance
         self._current_line = 1  # which line we are in
-        self._skip_lines = 11  # page up/down
+        self._skip_lines = 11  # page up/down or lines to be retrieved
         self._buffer = dict()  # line number, line content
         self._buffer_reads = 0
         self._buffer_size = 100
@@ -52,6 +52,7 @@ class BigFileHandler:
             self._current_line -= 1
 
     def down(self):
+        # safety checks to safely move down
         if self._total_lines is None:
             self._current_line += 1
         elif self._current_line <= self._total_lines - self._skip_lines:
@@ -64,6 +65,7 @@ class BigFileHandler:
             self._current_line -= self._skip_lines
 
     def page_down(self):
+        # safety checks to safely move down
         if self._total_lines is None:
             self._current_line += self._skip_lines
         elif self._current_line + self._skip_lines < self._total_lines:
@@ -80,13 +82,10 @@ class BigFileHandler:
             else:
                 self._current_line = line
 
-    # will read first 100 lines if requested line less than 100.
-    # will read last 100 file lines if requested line is 100 lines near the end
-    # will read 40 lines before and 60 lines after requested line case two options above weren't satisfied.
     def load_buffer(self):
 
         self._buffer.clear()
-        self._opened_file.seek(0)
+        self._opened_file.seek(0)  # start from file beginning
         self._buffer_reads += 1
 
         last_position = None
@@ -125,7 +124,7 @@ class BigFileHandler:
     def get_lines(self):
 
         if self._skip_lines == 11:
-            # only try to load lines if lines to show are equal to 11. If it is different, it
+            # only load buffer if lines to show are equal to 11. If it is different, it
             # means we are trying to open a less than 11 lines file.
 
             if self._current_line < self.get_buffer_min_value() or \

@@ -1,6 +1,6 @@
 import unittest
 
-from bfv_error import BigFileVisualizerFatalError
+from bfh_error import BigFileVisualizerFatalError
 from big_file_handler import BigFileHandler
 
 

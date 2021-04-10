@@ -1,10 +1,7 @@
 import argparse
-import traceback
-
 from sys import stderr
 from blessed import Terminal
-
-from bfv_error import BigFileVisualizerFatalError
+from bfh_error import BigFileVisualizerFatalError
 from big_file_handler import BigFileHandler
 
 term = Terminal()
