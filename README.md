@@ -17,10 +17,10 @@ There are shells that will do the hard work for you.
 ## To execute the application
 - Windows (inside cmd)
 1. Activate virtualenv: venv/Scripts/activate.bat
-2. Run the application: python app.py [filename]
+2. Run the application: python app.py -f [filename]
 - Linux/MacOS: 
 1. Activate virtualenv: source venv/bin/activate
-2. Run the application: python app.py [filename]
+2. Run the application: python app.py -f [filename]
 
 ## Usage and commands
 1. Arrow Up - move one position up.
@@ -29,3 +29,9 @@ There are shells that will do the hard work for you.
 4. Page Down - move eleven positions down.
 5. l - goto line.
 6. Ctrl+C - quit.
+
+## Project Details
+1. big_file_handler.py: Contains all the file navigation algorithm and logic.
+2. app.py: provides a command line interface to use the big_file_handler.py.
+3. file_creator.py: file creation tool used to test this application.
+4. tests/test_*.py: unit tests to ensure the expected results from this application.
