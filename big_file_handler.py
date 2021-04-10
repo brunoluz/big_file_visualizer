@@ -4,11 +4,10 @@ from bfv_error import BigFileVisualizerFatalError, BigFileVisualizerCustomError
 
 class BigFileHandler:
 
-    def __init__(self, file, debug=False):
+    def __init__(self, file):
         if not os.path.isfile(file):
             raise BigFileVisualizerFatalError(f"Specified file is not valid file: {file}")
 
-        self._debug = debug
         self._file = file  # file name
         self._opened_file = open(self._file, 'rt')  # opened file instance
         self._current_line = 1  # which line we are in
@@ -18,7 +17,7 @@ class BigFileHandler:
         self._buffer_size = 100
         self._total_lines = None  # if we reached end of file, we will save the last line number
 
-        self.load_buffer(self._current_line)
+        self.load_buffer()
 
     # enable working with "with" statement
     def __enter__(self):
@@ -53,48 +52,57 @@ class BigFileHandler:
             self._current_line -= 1
 
     def down(self):
-        self._current_line += 1
+        if self._total_lines is None:
+            self._current_line += 1
+        elif self._current_line < self._total_lines:
+            self._current_line += 1
 
     def page_up(self):
-
         if self._current_line < self._skip_lines:
             self._current_line = 1
         else:
             self._current_line -= self._skip_lines
 
     def page_down(self):
-        self._current_line += self._skip_lines
+        if self._total_lines is None:
+            self._current_line += self._skip_lines
+        elif self._current_line + self._skip_lines < self._total_lines:
+            self._current_line += self._skip_lines
 
     def goto(self, line):
         if line > 0:
-            self._current_line = line
+            if self._total_lines is not None and line > self._total_lines - self._skip_lines:
+                self._current_line = self._total_lines - self._skip_lines
+            else:
+                self._current_line = line
 
     # will read first 100 lines if requested line less than 100.
     # will read last 100 file lines if requested line is 100 lines near the end
     # will read 40 lines before and 60 lines after requested line case two options above weren't satisfied.
-    def load_buffer(self, requested_line):
+    def load_buffer(self):
 
         self._buffer.clear()
         self._opened_file.seek(0)
         self._buffer_reads += 1
 
-        last_position = None
 
+        last_position = None
         for position, line in enumerate(self._opened_file):
             eof = True
             last_position = position
             self._buffer[position + 1] = line.rstrip(os.linesep)
 
             # clear previous lines outside buffer
-            if position + 1 < requested_line - ((self._buffer_size / 2) - 1):
+            if position + 1 < self._current_line - ((self._buffer_size / 2) - 1):
                 self._buffer.pop(position + 1)
 
             # read next 50 lines from requested position
-            if position >= requested_line + ((self._buffer_size / 2) - 1):
+            if position >= self._current_line + ((self._buffer_size / 2) - 1):
                 eof = False  # not the end of file yet
                 break
 
         if last_position is None:
+            # we tried to open an empty file
             self._opened_file.close()
             raise BigFileVisualizerFatalError(f"Empty file: {self._file}")
 
@@ -102,6 +110,13 @@ class BigFileHandler:
             # we reached end of file
             # current line must be the last line minus lines to be shown.
             self._total_lines = last_position + 1
+
+            # handling small files
+            if self._buffer_size > self._total_lines:
+                self._buffer_size = self._total_lines
+            if self._skip_lines > self._total_lines:
+                self._skip_lines = 0
+
             self._current_line = self._total_lines - self._skip_lines
 
     def get_lines(self):
@@ -109,10 +124,14 @@ class BigFileHandler:
         # if requested line range is outside buffer, we need to load another buffer range.
         if self._current_line < min(self._buffer.keys()) or \
                 self._current_line + self._skip_lines > max(self._buffer.keys()):
-            self.load_buffer(self._current_line)
+            self.load_buffer()
 
+        # retrieve lines from buffer
         return_value = dict()
-        for i in range(self._current_line, self._current_line + self._skip_lines, 1):
+        i = self._current_line
+        while True:
             return_value[i] = self._buffer[i]
-
+            i += 1
+            if i > self._current_line + self._skip_lines:
+                break
         return return_value

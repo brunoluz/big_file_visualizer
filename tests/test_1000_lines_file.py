@@ -24,15 +24,18 @@ class Test1000LinesFile(unittest.TestCase):
         with BigFileHandler("1000_lines_file.txt") as bfh:
             bfh.goto(2)
             bfh.up()
+            lines = bfh.get_lines()
             self.assertEqual(1, bfh.get_current_line())
+            self.assertEqual("line 3", lines[3])
 
     def test_goto__line_999__validate_buffer(self):
         with BigFileHandler("1000_lines_file.txt") as bfh:
             bfh.goto(999)
-            bfh.get_lines()
+            lines = bfh.get_lines()
             self.assertEqual(1000, bfh.get_total_lines())
             self.assertEqual(1000, bfh.get_buffer_max_value())
             self.assertEqual(950, bfh.get_buffer_min_value())
+            self.assertEqual("line 999", lines[999])
 
     def test_goto__line_100__validate_buffer(self):
         with BigFileHandler("1000_lines_file.txt") as bfh:
@@ -46,6 +49,20 @@ class Test1000LinesFile(unittest.TestCase):
         with BigFileHandler("1000_lines_file.txt") as bfh:
             bfh.goto(-1)
             self.assertEqual(1, bfh.get_current_line())
+
+    def test_navigate_file_1(self):
+        with BigFileHandler("1000_lines_file.txt") as bfh:
+            lines_1 = bfh.get_lines()
+            bfh.page_down()
+            bfh.page_down()
+            bfh.page_down()
+            bfh.page_down()
+            bfh.page_down()
+            bfh.page_down()
+            lines_2 = bfh.get_lines()
+            bfh.goto(659)
+            lines_3 = bfh.get_lines()
+            self.assertEqual(3, bfh.get_buffer_reads())
 
 
 if __name__ == '__main__':

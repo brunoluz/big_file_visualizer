@@ -9,8 +9,8 @@ from big_file_handler import BigFileHandler
 
 term = Terminal()
 
-def read_command():
 
+def read_command():
     with term.cbreak():
         key = term.inkey()
         code = key.code
@@ -32,26 +32,28 @@ def read_command():
         line_number = input()
         if line_number.isnumeric():
             return "goto", int(line_number)
+        else:
+            return "nothing", None
 
     return "invalid", 0
+
 
 def print_lines():
     lines_dict = bfh.get_lines()
     print("showing lines...")
     [print(f"line {i}: {lines_dict[i]}") for i in lines_dict.keys()]
 
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Bigfile line visualizer tool')
-    parser.add_argument('--debug', action='store_true')
     parser.add_argument('--file', '-f', dest='file', help='file to be opened', required=True)
-    
 
     args = parser.parse_args()
 
     try:
 
-        with BigFileHandler(args.file, args.debug) as bfh:
+        with BigFileHandler(args.file) as bfh:
             print("***big file visualizer***")
             print_lines()
 
