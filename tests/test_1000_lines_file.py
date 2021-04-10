@@ -59,10 +59,7 @@ class Test1000LinesFile(unittest.TestCase):
             self.assertEqual("line 990", lines[990])
             self.assertEqual(11, len(lines))
 
-
-
-
-    def test_navigate_file_1(self):
+    def test_buffer_reads(self):
         with BigFileHandler("test_1000_lines_file.txt") as bfh:
             lines_1 = bfh.get_lines()
             bfh.page_down()
@@ -75,7 +72,3 @@ class Test1000LinesFile(unittest.TestCase):
             bfh.goto(659)
             lines_3 = bfh.get_lines()
             self.assertEqual(3, bfh.get_buffer_reads())
-
-
-if __name__ == '__main__':
-    unittest.main()
