@@ -38,10 +38,10 @@ python app.py -f [filename]
 6. Ctrl+C - quit.
 
 ## Project Details
-1. big_file_handler.py: Contains all the file navigation algorithm and logic.
-2. app.py: provides a command line interface to use the big_file_handler.py.
-3. file_creator.py: file creation tool used to test this application.
-4. tests/test_*.py: unit tests to ensure the expected results from this application.
+1. **big_file_handler.py**: Contains all the file navigation algorithm and logic.
+2. **app.py**: provides a command line interface to use the big_file_handler.py.
+3. **file_creator.py**: file creation tool used to test this application.
+4. **tests/test_*.py**: unit tests to ensure the expected results from this application.
 
 ## Further considerations - Next steps
 - Trying to make the 100 lines buffer work for small files (99 lines or less) has increased the code complexity and has no real value. This code could become more simpler if the buffer were used only for files bigger than 100 lines.
