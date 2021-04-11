@@ -35,3 +35,8 @@ There are shells that will do the hard work for you.
 2. app.py: provides a command line interface to use the big_file_handler.py.
 3. file_creator.py: file creation tool used to test this application.
 4. tests/test_*.py: unit tests to ensure the expected results from this application.
+
+## Further considerations - Next steps
+- Trying to make the 100 lines buffer work for small files (99 lines or less) has increased the code complexity and has no real value. This code could become more simpler if the buffer were used only for files bigger than 100 lines.
+- The buffer is "feeded" while the pointer navigates through the file. To increase performance, the next version of this code could arrive in the wanted line and only after that feed the buffer. This approach will increase performance.
+- To have great gains on performance, when the program starts, a background process could be started to map the line breaks on an index. Using an index would prevent reading the file from beginning every time a buffer is needed to load.
