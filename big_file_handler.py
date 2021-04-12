@@ -12,9 +12,8 @@ class BigFileHandler:
         self._opened_file = open(self._file, 'rt')  # opened file instance
         self._current_line = 1  # which line we are in
         self._skip_lines = 11  # page up/down or lines to be retrieved
-        self._line_break_index = dict()
         self._buffer = dict()  # line number, line content
-        self._buffer_reads = 0
+        self._buffer_reads = 0  # how many times the buffer was "fed"
         self._buffer_size = 100
         self._total_lines = None  # if we reached end of file, we will save the last line number
 
